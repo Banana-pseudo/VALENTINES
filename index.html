@@ -22,7 +22,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             text-align: center;
-            touch-action: manipulation;
+            touch-action: none; /* Critical for mobile to prevent scrolling/zooming */
         }
 
         .container {
@@ -57,7 +57,6 @@
             color: #555;
             line-height: 1.6;
             margin-bottom: 2rem;
-            font-size: clamp(0.9rem, 4vw, 1rem);
         }
 
         .buttons {
@@ -74,7 +73,6 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.1s ease;
             font-weight: bold;
             -webkit-tap-highlight-color: transparent;
         }
@@ -91,9 +89,7 @@
             color: white;
             position: relative;
             z-index: 999;
-            /* Using transition for a "sliding" escape feel */
-            transition: left 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                        top 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.2s ease; /* Makes the jump look smooth */
         }
 
         .bg-heart {
@@ -115,10 +111,7 @@
         }
 
         @keyframes floatUp {
-            to {
-                transform: translateY(-110vh) rotate(360deg);
-                opacity: 0;
-            }
+            to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
         }
     </style>
 </head>
@@ -138,53 +131,49 @@
 
         <div class="success-message" id="successMsg">
             <h1>YESYESYOW! ❤️</h1>
-            <p>wala ng bawian ha mwaps!</p>
+            <p>Wala ng bawian yan ha mwaps!</p>
             <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHhqMjZ1M3YxMGpmNTF4cnIzOGFhaHhxMXJ5YWk1ZDRsaXIwMzJmciZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Happy Dance">
         </div>
     </div>
 
     <script>
         const noBtn = document.getElementById('noBtn');
-        const padding = 120; // Radius around button to trigger run-away
 
-        // Function to move the button to a random safe spot
         function moveButton() {
-            // Calculate available space
-            const btnWidth = noBtn.offsetWidth;
-            const btnHeight = noBtn.offsetHeight;
-            
-            // Keep it 50px away from any edge
-            const maxX = window.innerWidth - btnWidth - 50;
-            const maxY = window.innerHeight - btnHeight - 50;
+            // Re-calculates screen size every jump to prevent deployment bugs
+            const width = window.innerWidth;
+            const height = window.innerHeight;
 
-            const newX = Math.max(50, Math.floor(Math.random() * maxX));
-            const newY = Math.max(50, Math.floor(Math.random() * maxY));
+            const maxX = width - noBtn.offsetWidth - 50;
+            const maxY = height - noBtn.offsetHeight - 50;
+
+            const newX = Math.floor(Math.random() * Math.max(0, maxX)) + 25;
+            const newY = Math.floor(Math.random() * Math.max(0, maxY)) + 25;
 
             noBtn.style.position = 'fixed';
-            noBtn.style.left = `${newX}px`;
-            noBtn.style.top = `${newY}px`;
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
         }
 
-        // WEB: Evasive behavior on mouse proximity
+        // DESKTOP: Move when mouse is near
         document.addEventListener('mousemove', (e) => {
             const rect = noBtn.getBoundingClientRect();
-            const btnCenterX = rect.left + rect.width / 2;
-            const btnCenterY = rect.top + rect.height / 2;
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const distance = Math.hypot(e.clientX - x, e.clientY - y);
 
-            const distance = Math.hypot(e.clientX - btnCenterX, e.clientY - btnCenterY);
-
-            if (distance < padding) {
+            if (distance < 120) {
                 moveButton();
             }
         });
 
-        // MOBILE: Evasive behavior on touch
+        // MOBILE: Move when touched
         noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Stop the click
+            e.preventDefault();
             moveButton();
         });
 
-        // Fail-safe for clicking
+        // SAFETY: Move if they somehow manage to click it
         noBtn.addEventListener('click', (e) => {
             e.preventDefault();
             moveButton();
@@ -208,7 +197,7 @@
             const duration = Math.random() * 3 + 2;
             heart.style.animation = `floatUp ${duration}s linear forwards`;
             document.body.appendChild(heart);
-            setTimeout(() => { heart.remove(); }, duration * 1000);
+            setTimeout(() => heart.remove(), duration * 1000);
         }
     </script>
 </body>
