@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For My Favorite Person ❤️</title>
+    <style>
+        :root {
+            --primary-pink: #ff4d6d;
+            --secondary-pink: #ff8fa3;
+            --bg-color: #fff0f3;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            text-align: center;
+            touch-action: manipulation;
+        }
+
+        .container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 420px;
+            width: 85%;
+            z-index: 10;
+            position: relative;
+        }
+
+        .heart-icon {
+            font-size: clamp(60px, 15vw, 80px);
+            color: var(--primary-pink);
+            animation: beat 1s infinite;
+        }
+
+        @keyframes beat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            color: var(--primary-pink);
+            margin-bottom: 1rem;
+            font-size: clamp(1.4rem, 6vw, 1.8rem);
+        }
+
+        p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-size: clamp(0.9rem, 4vw, 1rem);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            min-height: 60px;
+            align-items: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #yesBtn {
+            background-color: var(--primary-pink);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+            z-index: 2;
+        }
+
+        #noBtn {
+            background-color: #6c757d;
+            color: white;
+            position: relative;
+            z-index: 999;
+            /* Smooth slide for touch/hover movement */
+            transition: left 0.15s ease, top 0.15s ease;
+        }
+
+        .bg-heart {
+            position: absolute;
+            color: var(--secondary-pink);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .success-message {
+            display: none;
+        }
+
+        .success-message img {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainCard">
+        <div class="heart-icon">❤️</div>
+        <div id="content">
+            <h1>Will you be my Valentine?</h1>
+            <p>BAWAL ANG HUMINDI BOI,!</p>
+            
+            <div class="buttons">
+                <button id="yesBtn" onclick="celebrate()">Yes!</button>
+                <button id="noBtn">No</button>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMsg">
+            <h1>YESYESYOW! ❤️</h1>
+            <p>Panis wala ng bawian mwaps!</p>
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHhqMjZ1M3YxMGpmNTF4cnIzOGFhaHhxMXJ5YWk1ZDRsaXIwMzJmciZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Happy Dance">
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const padding = 100;
+
+      c
+        document.addEventListener('mousemove', (e) => {
+            const btnRect = noBtn.getBoundingClientRect();
+            const btnCenterX = btnRect.left + btnRect.width / 2;
+            const btnCenterY = btnRect.top + btnRect.height / 2;
+            const distance = Math.hypot(e.clientX - btnCenterX, e.clientY - btnCenterY);
+
+            if (distance < padding) {
+                moveButton();
+            }
+        });
+
+       
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            moveButton();
+        });
+
+        function moveButton() {
+            const maxX = window.innerWidth - noBtn.offsetWidth - 30;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 30;
+
+            const newX = Math.max(30, Math.random() * maxX);
+            const newY = Math.max(30, Math.random() * maxY);
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+        }
+
+        function celebrate() {
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('successMsg').style.display = 'block';
+            for(let i = 0; i < 50; i++) {
+                createHeart();
+            }
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('bg-heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '100vh';
+            heart.style.fontSize = Math.random() * 20 + 20 + 'px';
+            const duration = Math.random() * 3 + 2;
+            heart.style.animation = `floatUp ${duration}s linear forwards`;
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, duration * 1000);
+        }
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes floatUp {
+                to {
+                    transform: translateY(-110vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
