@@ -74,7 +74,7 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.1s ease;
             font-weight: bold;
             -webkit-tap-highlight-color: transparent;
         }
@@ -91,8 +91,9 @@
             color: white;
             position: relative;
             z-index: 999;
-            /* Smooth slide for touch/hover movement */
-            transition: left 0.15s ease, top 0.15s ease;
+            /* Using transition for a "sliding" escape feel */
+            transition: left 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        top 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .bg-heart {
@@ -112,6 +113,13 @@
             border-radius: 10px;
             margin-top: 1.5rem;
         }
+
+        @keyframes floatUp {
+            to {
+                transform: translateY(-110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -130,20 +138,39 @@
 
         <div class="success-message" id="successMsg">
             <h1>YESYESYOW! ❤️</h1>
-            <p>Panis wala ng bawian mwaps!</p>
+            <p>wala ng bawian ha mwaps!</p>
             <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHhqMjZ1M3YxMGpmNTF4cnIzOGFhaHhxMXJ5YWk1ZDRsaXIwMzJmciZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Happy Dance">
         </div>
     </div>
 
     <script>
         const noBtn = document.getElementById('noBtn');
-        const padding = 100;
+        const padding = 120; // Radius around button to trigger run-away
 
-      c
+        // Function to move the button to a random safe spot
+        function moveButton() {
+            // Calculate available space
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+            
+            // Keep it 50px away from any edge
+            const maxX = window.innerWidth - btnWidth - 50;
+            const maxY = window.innerHeight - btnHeight - 50;
+
+            const newX = Math.max(50, Math.floor(Math.random() * maxX));
+            const newY = Math.max(50, Math.floor(Math.random() * maxY));
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+        }
+
+        // WEB: Evasive behavior on mouse proximity
         document.addEventListener('mousemove', (e) => {
-            const btnRect = noBtn.getBoundingClientRect();
-            const btnCenterX = btnRect.left + btnRect.width / 2;
-            const btnCenterY = btnRect.top + btnRect.height / 2;
+            const rect = noBtn.getBoundingClientRect();
+            const btnCenterX = rect.left + rect.width / 2;
+            const btnCenterY = rect.top + rect.height / 2;
+
             const distance = Math.hypot(e.clientX - btnCenterX, e.clientY - btnCenterY);
 
             if (distance < padding) {
@@ -151,29 +178,23 @@
             }
         });
 
-       
+        // MOBILE: Evasive behavior on touch
         noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); 
+            e.preventDefault(); // Stop the click
             moveButton();
         });
 
-        function moveButton() {
-            const maxX = window.innerWidth - noBtn.offsetWidth - 30;
-            const maxY = window.innerHeight - noBtn.offsetHeight - 30;
-
-            const newX = Math.max(30, Math.random() * maxX);
-            const newY = Math.max(30, Math.random() * maxY);
-
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = `${newX}px`;
-            noBtn.style.top = `${newY}px`;
-        }
+        // Fail-safe for clicking
+        noBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            moveButton();
+        });
 
         function celebrate() {
             document.getElementById('content').style.display = 'none';
             document.getElementById('successMsg').style.display = 'block';
             for(let i = 0; i < 50; i++) {
-                createHeart();
+                setTimeout(createHeart, i * 60);
             }
         }
 
@@ -189,17 +210,6 @@
             document.body.appendChild(heart);
             setTimeout(() => { heart.remove(); }, duration * 1000);
         }
-
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes floatUp {
-                to {
-                    transform: translateY(-110vh) rotate(360deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
